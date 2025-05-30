@@ -1,13 +1,64 @@
 <template>
-  <v-container>
-    <v-form @submit.prevent="submit">
-      <v-text-field v-model="username" label="Username" required />
-      <v-text-field v-model="email" label="Email" required />
-      <v-text-field v-model="password" label="Password" type="password" required />
-      <v-btn type="submit" color="primary">Register</v-btn>
-    </v-form>
-    <v-alert v-if="error" type="error" class="mt-3">{{ error }}</v-alert>
-    <v-alert v-if="success" type="success" class="mt-3">Registration successful! Please login.</v-alert>
+  <v-container
+    class="login-background"
+    fluid
+    style="min-height: 100vh; display: flex; align-items: center; justify-content: center;"
+  >
+    <v-card class="login-card">
+      <v-card-title class="headline text-center mb-4">Регистрация</v-card-title>
+      <v-form @submit.prevent="submit">
+        <v-text-field
+          v-model="username"
+          label="Логин"
+          placeholder="Придумайте логин"
+          prepend-inner-icon="mdi-account"
+          variant="outlined"
+          class="mb-3"
+          density="comfortable"
+          required
+        />
+        <v-text-field
+          v-model="email"
+          label="Email"
+          placeholder="example@email.com"
+          prepend-inner-icon="mdi-email"
+          variant="outlined"
+          class="mb-3"
+          density="comfortable"
+          required
+        />
+        <v-text-field
+          v-model="password"
+          label="Пароль"
+          placeholder="Придумайте пароль"
+          type="password"
+          prepend-inner-icon="mdi-lock"
+          variant="outlined"
+          class="mb-2"
+          density="comfortable"
+          required
+        />
+        <v-btn
+          type="submit"
+          color="primary"
+          block
+          class="login-btn"
+          height="56"
+        >
+          Зарегистрироваться
+        </v-btn>
+        <v-btn
+          variant="text"
+          block
+          class="mt-2"
+          @click="router.push('/login')"
+        >
+          Уже есть аккаунт? Войти
+        </v-btn>
+      </v-form>
+      <v-alert v-if="error" type="error" class="mt-3">{{ error }}</v-alert>
+      <v-alert v-if="success" type="success" class="mt-3">Регистрация успешна! Пожалуйста, войдите.</v-alert>
+    </v-card>
   </v-container>
 </template>
 
@@ -39,3 +90,33 @@ async function submit() {
   }
 }
 </script>
+
+
+<style scoped>
+.login-background {
+  background: #07519a !important;
+}
+.login-card {
+  max-width: 450px;
+  width: 100%;
+  padding: 36px 32px 32px 32px;
+  border-radius: 14px;
+  box-shadow: 0 10px 36px rgba(7, 81, 154, 0.08);
+}
+.login-btn {
+  font-size: 20px;
+  font-weight: 600;
+  background: #07519a;
+  color: #fff;
+}
+.forgot-link {
+  color: #216ad7;
+  font-size: 15px;
+  text-decoration: none;
+}
+.headline {
+  font-size: 32px;
+  font-weight: 500;
+}
+</style>
+

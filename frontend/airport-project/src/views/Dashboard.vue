@@ -1,57 +1,52 @@
 <template>
   <v-app>
-    <!-- Боковая панель -->
-    <v-navigation-drawer app permanent class="sidebar">
-      <v-list>
-        <v-list-item class="sidebar-title">
-          <v-icon class="mr-2 blue--text text--darken-3">mdi-airplane</v-icon>
-          <span class="text-h6 font-weight-bold airline-title">AIRWAY</span>
-        </v-list-item>
-        <v-divider />
-        <v-list-item prepend-icon="mdi-view-dashboard" class="sidebar-link">Dashboard</v-list-item>
-        <v-list-item prepend-icon="mdi-ticket" class="sidebar-link">Bookings</v-list-item>
-        <v-list-item prepend-icon="mdi-check" class="sidebar-link">Check-in</v-list-item>
-        <v-list-item prepend-icon="mdi-briefcase" class="sidebar-link">Baggage</v-list-item>
-        <v-list-item prepend-icon="mdi-cog" class="sidebar-link">Maintenance</v-list-item>
-      </v-list>
-    </v-navigation-drawer>
-
-    <!-- Верхняя панель -->
-    <v-app-bar app color="white" flat class="app-bar-elevated">
-      <v-toolbar-title>
-        <span class="welcome">Добро пожаловать, <b>{{ userName ? userName : 'User' }}</b>!</span>
+    <!-- Верхняя навигационная панель -->
+    <v-app-bar app flat color="#07519a" dark class="main-app-bar">
+      <v-toolbar-title class="airway-title">
+        <v-icon left>mdi-airplane</v-icon>
+        AIRWAY
       </v-toolbar-title>
       <v-spacer />
-      <v-btn icon><v-icon color="blue darken-2">mdi-bell</v-icon></v-btn>
-      <v-btn icon><v-icon color="blue darken-2">mdi-account</v-icon></v-btn>
+      <v-btn text class="nav-link" @click="router.push('/')">Главная</v-btn>
+      <v-btn text class="nav-link" @click="router.push('/flights')">Рейсы</v-btn>
+      <v-btn text class="nav-link" @click="router.push('/dashboard')">Панель</v-btn>
+      <v-btn text class="nav-link">Обслуживание</v-btn>
+      <v-btn icon>
+        <v-icon>mdi-account-circle</v-icon>
+      </v-btn>
     </v-app-bar>
 
     <v-main class="dashboard-bg">
       <v-container>
+        <!-- Блок приветствия -->
+        <div class="welcome-block">
+          <h2>Здравствуйте, <span class="user-name">{{ userName || 'User' }}</span>!</h2>
+          <div class="divider-bar"></div>
+          <p>Добро пожаловать в ваш личный кабинет управления полётами!</p>
+        </div>
+
         <!-- Карточки статистики -->
-        <v-row>
+        <v-row class="mb-8" justify="center">
           <v-col cols="12" md="3" v-for="card in cards" :key="card.title">
             <v-card class="stat-card">
-              <v-card-title>
-                <span :class="card.color">{{ card.value }}</span>
-              </v-card-title>
-              <v-card-subtitle>{{ card.title }}</v-card-subtitle>
+              <div class="stat-value">{{ card.value }}</div>
+              <div class="stat-title">{{ card.title }}</div>
             </v-card>
           </v-col>
         </v-row>
 
-        <!-- Recent Bookings по центру -->
+        <!-- Блок с последними бронированиями -->
         <v-row justify="center">
           <v-col cols="12" md="8">
             <v-card class="recent-card">
-              <v-card-title class="justify-center recent-title">Recent Bookings</v-card-title>
+              <v-card-title class="recent-title justify-center">Последние бронирования</v-card-title>
               <v-table class="recent-table">
                 <thead>
                   <tr>
-                    <th>Flight</th>
-                    <th>Seat</th>
-                    <th>Date</th>
-                    <th>Status</th>
+                    <th>Рейс</th>
+                    <th>Место</th>
+                    <th>Дата</th>
+                    <th>Статус</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -60,7 +55,7 @@
                     <td>{{ ticket.seat_number }}</td>
                     <td>{{ formatDate(ticket.purchase_date) }}</td>
                     <td>
-                      <v-chip :color="ticket.status === 'booked' ? 'blue darken-1' : 'grey'" dark>
+                      <v-chip :color="ticket.status === 'booked' ? 'primary' : 'grey'" dark>
                         {{ ticket.status }}
                       </v-chip>
                     </td>
@@ -77,7 +72,10 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import api from '@/api'
+
+const router = useRouter()
 
 const flightsCount = ref('-')
 const checkinsCount = ref('-')
@@ -117,77 +115,94 @@ onMounted(async () => {
 })
 
 const cards = computed(() => [
-  { title: "Today's Flights", value: flightsCount.value, color: 'primary-text' },
-  { title: 'Check-ins', value: checkinsCount.value, color: 'primary-text' },
-  { title: 'Bookings', value: bookingsCount.value, color: 'primary-text' },
-  { title: 'Maintenance Tasks', value: maintenanceCount.value, color: 'primary-text' },
+  { title: "Рейсы сегодня", value: flightsCount.value },
+  { title: "Чекины", value: checkinsCount.value },
+  { title: "Бронирования", value: bookingsCount.value },
+  { title: "Обслуживание", value: maintenanceCount.value },
 ])
 </script>
 
 <style scoped>
-/* Цвета */
-.dashboard-bg {
-  background: #f5f8fd;
-  min-height: 100vh;
+.main-app-bar {
+  background: #07519a !important;
 }
-.sidebar {
-  background: #1565c0 !important;
-  color: #fff !important;
-}
-.sidebar-title {
-  margin-bottom: 8px;
-  color: #fff !important;
-}
-.airline-title {
-  color: #fff;
+.airway-title {
+  font-size: 1.3rem;
   font-weight: bold;
-  letter-spacing: 0.5px;
+  letter-spacing: 1.5px;
 }
-.sidebar-link {
-  color: #cfd8dc !important;
+.nav-link {
+  font-size: 1rem;
   font-weight: 500;
-}
-.sidebar-link:hover {
-  background: #1976d2 !important;
   color: #fff !important;
+  margin: 0 4px;
+  text-transform: none;
 }
-
-.app-bar-elevated {
-  box-shadow: 0 2px 8px 0 #1565c022;
+.nav-link:hover {
+  background: #1976d2 !important;
 }
-
-.stat-card {
+.dashboard-bg {
+  background: linear-gradient(120deg, #07519a 70%, #e3f0fd 100%);
+  min-height: 100vh;
+  padding-top: 42px;
+}
+.welcome-block {
   background: #fff;
-  color: #1565c0;
   border-radius: 18px;
-  box-shadow: 0 2px 16px #1565c015;
-  min-height: 120px;
+  box-shadow: 0 2px 16px #07519a22;
+  padding: 28px 32px 18px 32px;
+  margin: 40px auto 24px auto;
+  max-width: 600px;
   text-align: center;
 }
-.stat-card .v-card-title {
-  font-size: 2.4rem;
-  font-weight: bold;
-  color: #1565c0;
+.welcome-block h2 {
+  color: #07519a;
+  font-weight: 700;
+  font-size: 2rem;
 }
-.stat-card .v-card-subtitle {
-  color: #444;
-  font-size: 1rem;
-  margin-top: -10px;
+.welcome-block .user-name {
+  color: #1976d2;
 }
-.primary-text {
-  color: #1565c0 !important;
+.divider-bar {
+  width: 50px;
+  height: 3px;
+  margin: 12px auto;
+  background: #1976d2;
+  border-radius: 6px;
 }
-
+.stat-card {
+  background: #e3f0fd;
+  color: #07519a;
+  border-radius: 16px;
+  box-shadow: 0 2px 16px #07519a13;
+  min-height: 112px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.stat-value {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #07519a;
+  margin-bottom: 4px;
+}
+.stat-title {
+  font-size: 1.08rem;
+  font-weight: 500;
+  color: #1976d2;
+  letter-spacing: 0.6px;
+}
 .recent-card {
   margin-top: 2rem;
   border-radius: 16px;
   background: #fff;
   box-shadow: 0 2px 16px #1565c017;
 }
-
 .recent-title {
   font-weight: bold;
-  color: #1565c0;
+  color: #07519a;
   font-size: 1.3rem;
   letter-spacing: 1px;
 }
@@ -202,11 +217,5 @@ const cards = computed(() => [
   font-size: 1rem;
   border-radius: 8px;
   letter-spacing: 0.2px;
-}
-.welcome {
-  color: #1565c0;
-  font-size: 1.15rem;
-  font-weight: 500;
-  letter-spacing: 0.3px;
 }
 </style>
