@@ -1,8 +1,5 @@
 <template>
   <v-app>
-    <v-app-bar app>
-      <v-toolbar-title>My App</v-toolbar-title>
-    </v-app-bar>
     <v-main>
       <RouterView />
     </v-main>

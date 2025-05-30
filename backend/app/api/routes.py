@@ -18,8 +18,9 @@ def profile():
     return jsonify({
         "username": user.username,
         "email": user.email,
-        "roles": [role.name for role in user.roles]
+        "roles": []  # пока просто пустой список!
     })
+
 @api_bp.route('/flights', methods=['GET'])
 @jwt_required()
 def get_flights():
