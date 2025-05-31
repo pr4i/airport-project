@@ -7,12 +7,18 @@
         AIRWAY
       </v-toolbar-title>
       <v-spacer />
+      <v-btn v-if="userStore.isAdmin" text @click="router.push('/admin')">Админ-панель</v-btn>
       <v-btn text class="nav-link" @click="router.push('/')">Главная</v-btn>
       <v-btn text class="nav-link" @click="router.push('/flights')">Рейсы</v-btn>
       <v-btn text class="nav-link" @click="router.push('/dashboard')">Панель</v-btn>
       <v-btn text class="nav-link">Обслуживание</v-btn>
-      <v-btn icon>
-        <v-icon>mdi-account-circle</v-icon>
+      <v-btn
+        color="error"
+        text
+        class="nav-link"
+        @click="logout"
+      >
+        <v-icon left>mdi-logout</v-icon> Выйти
       </v-btn>
     </v-app-bar>
 
@@ -74,13 +80,15 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '@/api'
-
-const router = useRouter()
+import { useUserStore } from '@/stores/user'
+import { storeToRefs } from 'pinia'
 
 const flightsCount = ref('-')
 const checkinsCount = ref('-')
 const bookingsCount = ref('-')
 const maintenanceCount = ref('-')
+const router = useRouter()
+const userStore = useUserStore()
 
 const userName = ref('')
 const recentTickets = ref([])
@@ -120,6 +128,11 @@ const cards = computed(() => [
   { title: "Бронирования", value: bookingsCount.value },
   { title: "Обслуживание", value: maintenanceCount.value },
 ])
+
+function logout() {
+  userStore.logout()
+  router.push('/home')
+}
 </script>
 
 <style scoped>

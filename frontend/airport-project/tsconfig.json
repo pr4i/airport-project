@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "lib": ["esnext", "dom"],
+    "types": ["node"],
+    "esModuleInterop": true,
+    "baseUrl": ".",
+    "paths": {
+      "*.css": ["./src/__mocks__/styleMock.js"]
+    }
+  }
+}

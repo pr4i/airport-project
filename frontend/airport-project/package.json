@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "axios": "^1.9.0",
-    "pinia": "^3.0.1",
+    "pinia": "^3.0.2",
     "postcss": "^8.5.3",
     "postcss-loader": "^8.1.1",
     "saas": "^1.0.0",
@@ -23,12 +23,18 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
+    "@pinia/testing": "^1.0.1",
+    "@testing-library/vue": "^8.1.0",
+    "@types/node": "^22.15.29",
     "@vitejs/plugin-vue": "^5.2.3",
     "eslint": "^9.22.0",
     "eslint-plugin-vue": "~10.0.0",
     "globals": "^16.0.0",
+    "jsdom": "^26.1.0",
     "sass-loader": "^16.0.5",
     "vite": "^6.2.4",
-    "vite-plugin-vue-devtools": "^7.7.2"
+    "vite-plugin-vue-devtools": "^7.7.2",
+    "vitest": "^3.1.4",
+    "vue-test-utils": "^0.5.0"
   }
 }

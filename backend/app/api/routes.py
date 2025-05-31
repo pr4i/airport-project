@@ -15,10 +15,18 @@ def profile():
     user = User.query.get(user_id)
     if not user:
         return jsonify({"msg": "User not found"}), 404
+
+    # Получаем список ролей
+    roles = []
+    if hasattr(user, 'roles'):  # если есть поле .roles (relationship)
+        roles = [r.name for r in user.roles]
+    elif hasattr(user, 'user_roles'):  # если через промежуточную таблицу user_roles
+        roles = [r.role.name for r in user.user_roles]
+
     return jsonify({
         "username": user.username,
         "email": user.email,
-        "roles": []  # пока просто пустой список!
+        "roles": roles  # вот здесь возвращаем реальные роли!
     })
 
 @api_bp.route('/flights', methods=['GET'])

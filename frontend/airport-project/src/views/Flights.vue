@@ -1,90 +1,84 @@
 <template>
-  <v-container>
-      <v-navigation-drawer app permanent class="sidebar">
-      <v-list>
-        <v-list-item class="sidebar-title">
-          <v-icon class="mr-2">mdi-airplane</v-icon>
-          <span class="text-h6 font-weight-bold airline-title">AIRWAY</span>
-        </v-list-item>
-        <v-divider />
-        <v-list-item prepend-icon="mdi-view-dashboard" class="sidebar-link" @click="router.push('/dashboard')">
-          Dashboard
-        </v-list-item>
-        <v-list-item prepend-icon="mdi-airplane" class="sidebar-link" @click="router.push('/flights')">
-          Flights
-        </v-list-item>
-        <v-list-item prepend-icon="mdi-check" class="sidebar-link">
-          Check-in
-        </v-list-item>
-        <v-list-item prepend-icon="mdi-briefcase" class="sidebar-link">
-          Baggage
-        </v-list-item>
-        <v-list-item prepend-icon="mdi-cog" class="sidebar-link">
-          Maintenance
-        </v-list-item>
-      </v-list>
-    </v-navigation-drawer>
-    <v-card class="flights-card">
-      <v-card-title class="flights-title">Доступные рейсы</v-card-title>
-      <v-table class="flights-table">
-        <thead>
-          <tr>
-            <th>Номер рейса</th>
-            <th>Откуда</th>
-            <th>Куда</th>
-            <th>Дата и время</th>
-            <th>Самолёт</th>
-            <th>Действие</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="flight in flights" :key="flight.id">
-            <td>{{ flight.flight_number }}</td>
-            <td>{{ flight.origin }}</td>
-            <td>{{ flight.destination }}</td>
-            <td>{{ formatDate(flight.departure_time) }}</td>
-            <td>{{ flight.aircraft || '-' }}</td>
-            <td>
-              <v-btn color="primary" @click="openDialog(flight)">Забронировать</v-btn>
-            </td>
-          </tr>
-        </tbody>
-      </v-table>
-    </v-card>
+  <v-app>
+    <!-- Верхний бар, как в Home.vue -->
+    <v-app-bar app flat color="#07519a" dark>
+      <v-toolbar-title>
+        <v-icon left>mdi-airplane</v-icon>
+        AIRWAY
+      </v-toolbar-title>
+      <v-spacer />
+      <v-btn text @click="router.push('/home')">Главная</v-btn>
+      <v-btn text @click="router.push('/flights')">Рейсы</v-btn>
+      <v-btn text>Онлайн-табло</v-btn>
+      <v-btn text @click="router.push('/dashboard')">Личный кабинет</v-btn>
+      <v-btn icon><v-icon>mdi-account-circle</v-icon></v-btn>
+    </v-app-bar>
 
-    <!-- Диалог бронирования -->
-    <v-dialog v-model="dialog" max-width="400">
-      <v-card>
-        <v-card-title class="headline">Бронирование билета</v-card-title>
-        <v-card-text>
-          <div class="mb-2">
-            <strong>Рейс:</strong> {{ selectedFlight?.flight_number }}<br>
-            <strong>Маршрут:</strong> {{ selectedFlight?.origin }} → {{ selectedFlight?.destination }}<br>
-            <strong>Дата:</strong> {{ formatDate(selectedFlight?.departure_time) }}
-          </div>
-          <v-select
-            v-model="form.seatClass"
-            :items="['Эконом', 'Бизнес']"
-            label="Класс"
-            required
-            class="mb-3"
-          />
-          <v-text-field
-            v-model="form.seatNumber"
-            label="Место (например, 7A)"
-            required
-            class="mb-3"
-          />
-        </v-card-text>
-        <v-card-actions>
-          <v-btn variant="text" @click="dialog = false">Отмена</v-btn>
-          <v-btn color="primary" @click="bookTicket" :loading="loading">Забронировать</v-btn>
-        </v-card-actions>
-        <v-alert v-if="error" type="error" class="mt-2">{{ error }}</v-alert>
-        <v-alert v-if="success" type="success" class="mt-2">Бронирование успешно!</v-alert>
-      </v-card>
-    </v-dialog>
-  </v-container>
+    <v-main class="main-section">
+      <v-container>
+        <v-card class="flights-card">
+          <v-card-title class="flights-title">Доступные рейсы</v-card-title>
+          <v-table class="flights-table">
+            <thead>
+              <tr>
+                <th>Номер рейса</th>
+                <th>Откуда</th>
+                <th>Куда</th>
+                <th>Дата и время</th>
+                <th>Самолёт</th>
+                <th>Действие</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="flight in flights" :key="flight.id">
+                <td>{{ flight.flight_number }}</td>
+                <td>{{ flight.origin }}</td>
+                <td>{{ flight.destination }}</td>
+                <td>{{ formatDate(flight.departure_time) }}</td>
+                <td>{{ flight.aircraft || '-' }}</td>
+                <td>
+                  <v-btn color="primary" @click="openDialog(flight)">Забронировать</v-btn>
+                </td>
+              </tr>
+            </tbody>
+          </v-table>
+        </v-card>
+      </v-container>
+
+      <!-- Диалог бронирования -->
+      <v-dialog v-model="dialog" max-width="400">
+        <v-card>
+          <v-card-title class="headline">Бронирование билета</v-card-title>
+          <v-card-text>
+            <div class="mb-2">
+              <strong>Рейс:</strong> {{ selectedFlight?.flight_number }}<br>
+              <strong>Маршрут:</strong> {{ selectedFlight?.origin }} → {{ selectedFlight?.destination }}<br>
+              <strong>Дата:</strong> {{ formatDate(selectedFlight?.departure_time) }}
+            </div>
+            <v-select
+              v-model="form.seatClass"
+              :items="['Эконом', 'Бизнес']"
+              label="Класс"
+              required
+              class="mb-3"
+            />
+            <v-text-field
+              v-model="form.seatNumber"
+              label="Место (например, 7A)"
+              required
+              class="mb-3"
+            />
+          </v-card-text>
+          <v-card-actions>
+            <v-btn variant="text" @click="dialog = false">Отмена</v-btn>
+            <v-btn color="primary" @click="bookTicket" :loading="loading">Забронировать</v-btn>
+          </v-card-actions>
+          <v-alert v-if="error" type="error" class="mt-2">{{ error }}</v-alert>
+          <v-alert v-if="success" type="success" class="mt-2">Бронирование успешно!</v-alert>
+        </v-card>
+      </v-dialog>
+    </v-main>
+  </v-app>
 </template>
 
 <script setup>
@@ -105,13 +99,12 @@ const form = ref({
   seatNumber: '',
 })
 
-// Загрузка рейсов
 onMounted(async () => {
   try {
     const res = await api.get('/api/flights')
     flights.value = res.data
   } catch (e) {
-    // Можно добавить обработку ошибки
+    // обработка ошибки
   }
 })
 
@@ -140,7 +133,6 @@ async function bookTicket() {
       seat_class: form.value.seatClass,
     })
     success.value = true
-    // Можно закрыть диалог через 1.5 сек и обновить список билетов
     setTimeout(() => { dialog.value = false }, 1500)
   } catch (e) {
     error.value = e.response?.data?.msg || 'Ошибка бронирования'
@@ -150,12 +142,19 @@ async function bookTicket() {
 </script>
 
 <style scoped>
+.main-section {
+  background: linear-gradient(120deg, #07519a 70%, #e3f0fd 100%);
+  min-height: 100vh;
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
 .flights-card {
   margin: 2rem auto;
-  border-radius: 16px;
+  border-radius: 18px;
   box-shadow: 0 2px 16px #1565c017;
   background: #fff;
   max-width: 1200px;
+  padding-bottom: 20px;
 }
 .flights-title {
   font-size: 2rem;
@@ -163,6 +162,7 @@ async function bookTicket() {
   font-weight: bold;
   text-align: center;
   letter-spacing: 1px;
+  margin-bottom: 10px;
 }
 .flights-table th,
 .flights-table td {
@@ -184,62 +184,4 @@ async function bookTicket() {
 .v-dialog .v-btn {
   min-width: 110px;
 }
-.flights-card {
-  margin: 2rem auto;
-  border-radius: 16px;
-  box-shadow: 0 2px 16px #1565c017;
-  background: #fff;
-  max-width: 1200px;
-}
-.flights-title {
-  font-size: 2rem;
-  color: #1565c0;
-  font-weight: bold;
-  text-align: center;
-  letter-spacing: 1px;
-}
-.flights-table th,
-.flights-table td {
-  text-align: center;
-  font-size: 1rem;
-  padding: 12px 6px;
-}
-.flights-table th {
-  color: #1565c0;
-  background: #e3f0fd;
-}
-.v-btn {
-  font-weight: 600;
-}
-.v-dialog .v-card-title {
-  color: #1565c0;
-  font-weight: 600;
-}
-.v-dialog .v-btn {
-  min-width: 110px;
-}
-
-/* Добавь стили для боковой панели — КОПИРУЙ из Dashboard */
-.sidebar {
-  background: #1565c0 !important;
-  color: #fff !important;
-}
-.sidebar-title {
-  margin-bottom: 8px;
-  color: #fff !important;
-}
-.airline-title {
-  color: #fff;
-  font-weight: bold;
-  letter-spacing: 0.5px;
-}
-.sidebar-link {
-  color: #cfd8dc !important;
-  font-weight: 500;
-}
-.sidebar-link:hover {
-  background: #1976d2 !important;
-  color: #fff !important;
-}
-
 </style>
