@@ -4,7 +4,7 @@ from app.models import User, Flight, Ticket, Luggage, Payment
 from app import db
 from datetime import datetime
 from app.utils import roles_required
-
+from sqlalchemy.orm import joinedload
 
 api_bp = Blueprint('api', __name__)
 
@@ -221,12 +221,23 @@ def create_luggage():
 @jwt_required()
 def delete_luggage(id):
     user_id = get_jwt_identity()
-    luggage = Luggage.query.get_or_404(id)
-    if luggage.ticket.user_id != user_id:
+    luggage = Luggage.query.options(joinedload(Luggage.ticket)).get_or_404(id)
+
+    print("JWT user_id:", user_id)
+    print("Luggage.ticket.user_id:", getattr(luggage.ticket, 'user_id', None))
+    print("TYPE JWT user_id:", type(user_id))
+    print("TYPE Luggage.ticket.user_id:", type(luggage.ticket.user_id))
+    print("Luggage id:", luggage.id)
+    print("Ticket id:", luggage.ticket_id)
+
+    if not luggage.ticket or luggage.ticket.user_id != int(user_id):
         return jsonify({"msg": "Unauthorized"}), 403
+
     db.session.delete(luggage)
     db.session.commit()
-    return jsonify({"msg": "Luggage deleted"})
+    return jsonify({"msg": "Luggage deleted"}), 200
+
+
 
 @api_bp.route('/payments', methods=['GET'])
 @jwt_required()
@@ -268,8 +279,11 @@ def create_payment():
 @jwt_required()
 def update_payment(id):
     user_id = get_jwt_identity()
+    # cast user_id to int for reliable comparison
+    user_id = int(user_id)
     payment = Payment.query.get_or_404(id)
-    if payment.ticket.user_id != user_id:
+    # возможно, нужно сделать joinedload для ticket:
+    if not payment.ticket or payment.ticket.user_id != user_id:
         return jsonify({"msg": "Unauthorized"}), 403
 
     data = request.get_json()
