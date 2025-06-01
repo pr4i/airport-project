@@ -45,4 +45,4 @@ backend/ — серверная часть на Flask
 frontend/airport-project/ — клиентская часть на Vue 3 + Vuetify + Vite
 
 Контакты
-Для вопросов и поддержки: your.email@example.com
+Для вопросов и поддержки: danilakovalev77@gmail.com
