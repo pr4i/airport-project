@@ -5,6 +5,8 @@ import Dashboard from '@/views/Dashboard.vue'
 import Register from '@/views/Register.vue'
 import Home from '@/views/Home.vue'
 import AdminPanel from '@/views/AdminPanel.vue'
+import OnlineBoard from '@/views/OnlineBoard.vue'
+import Checkin from '@/views/Checkin.vue'
 import { useUserStore } from '@/stores/user'
 
 const routes = [
@@ -14,7 +16,10 @@ const routes = [
   { path: '/login', component: Login, name: 'Login' },
   { path: '/register', component: Register, name: 'Register' },
   { path: '/home', component: Home, name: 'Home' },
+  { path: '/onlineboard', component: OnlineBoard, name: 'Onlineboard' },
   { path: '/admin', component: AdminPanel, name: 'AdminPanel', meta: { requiresAdmin: true } },
+  { path: '/checkin', component: Checkin, name: 'Checkin' },
+
 ]
 
 const router = createRouter({

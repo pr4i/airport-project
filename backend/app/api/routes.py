@@ -1,10 +1,14 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app.models import User, Flight, Ticket, Luggage, Payment
+from flask_cors import cross_origin   # добавь импорт!
+from app.models import User, Flight, Ticket, Luggage, Payment, Airport, CheckIn
 from app import db
-from datetime import datetime
+from datetime import datetime, timedelta
 from app.utils import roles_required
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, aliased
+from sqlalchemy import and_, or_, func
+
+
 
 api_bp = Blueprint('api', __name__)
 
@@ -28,23 +32,6 @@ def profile():
         "email": user.email,
         "roles": roles  # вот здесь возвращаем реальные роли!
     })
-
-@api_bp.route('/flights', methods=['GET'])
-@jwt_required()
-def get_flights():
-    flights = Flight.query.all()
-    result = []
-    for f in flights:
-        result.append({
-            "id": f.id,
-            "flight_number": f.flight_number,
-            "departure_time": f.departure_time.isoformat(),
-            "arrival_time": f.arrival_time.isoformat(),
-            "origin": f.origin.name if f.origin else None,
-            "destination": f.destination.name if f.destination else None,
-            "airplane": f.airplane.model if f.airplane else None
-        })
-    return jsonify(result)
 
 @api_bp.route('/flights/<int:id>', methods=['GET'])
 @jwt_required()
@@ -291,3 +278,161 @@ def update_payment(id):
         payment.status = data['status']
     db.session.commit()
     return jsonify({"msg": "Payment updated"})
+
+@api_bp.route('/airports', methods=['GET'])
+def get_airports():
+    airports = []
+    for a in Airport.query.order_by(Airport.city, Airport.name).all():
+        airports.append({
+            "id": a.id,
+            "name": a.name,
+            "city": a.city,
+            "code": a.code
+        })
+    return jsonify(airports)
+
+from sqlalchemy import and_, or_
+@api_bp.route('/flights', methods=['GET'])
+def get_flights():
+    # Получаем параметры поиска
+    origin = request.args.get('origin')
+    destination = request.args.get('destination')
+    date_str = request.args.get('date')
+
+    # Создаём алиасы для аэропортов
+    AirportOrigin = aliased(Airport)
+    AirportDest = aliased(Airport)
+
+    # Строим запрос с правильными join-ами
+    query = Flight.query \
+        .join(AirportOrigin, Flight.origin_id == AirportOrigin.id) \
+        .join(AirportDest, Flight.destination_id == AirportDest.id)
+
+    # Фильтрация по городам
+    if origin:
+        query = query.filter(AirportOrigin.city == origin)
+    if destination:
+        query = query.filter(AirportDest.city == destination)
+
+    # Фильтрация по дате (если нужно)
+    if date_str:
+        try:
+            date = datetime.strptime(date_str, "%Y-%m-%d")
+            date_start = datetime(date.year, date.month, date.day, 0, 0, 0)
+            date_end = date_start + timedelta(days=1)
+            query = query.filter(
+                Flight.departure_time >= date_start,
+                Flight.departure_time < date_end
+            )
+        except Exception:
+            pass  # если дата некорректная — игнорируем
+
+    flights = query.all()
+
+    # Формируем ответ
+    result = []
+    for f in flights:
+        result.append({
+            "id": f.id,
+            "flight_number": f.flight_number,
+            "departure_time": f.departure_time.isoformat(),
+            "arrival_time": f.arrival_time.isoformat(),
+            "origin": f.origin.name if f.origin else None,
+            "destination": f.destination.name if f.destination else None,
+            "airplane": f.airplane.model if f.airplane else None,
+            "price": f.price,
+            "status": f.status,
+            "terminal": f.terminal,
+            "gate": f.gate
+        })
+    return jsonify(result)
+
+@api_bp.route('/flights/dates', methods=['GET'])
+def get_flight_dates():
+    origin = request.args.get('origin')
+    destination = request.args.get('destination')
+
+    query = db.session.query(
+        func.date(Flight.departure_time).label('date'),
+        func.min(Flight.price).label('min_price')
+    )
+
+    if origin:
+        query = query.join(Airport, Flight.origin_id == Airport.id).filter(Airport.city == origin)
+    if destination:
+        query = query.join(Airport, Flight.destination_id == Airport.id).filter(Airport.city == destination)
+
+    query = query.group_by(func.date(Flight.departure_time)).order_by('date')
+
+    result = []
+    for row in query.all():
+        result.append({
+            "date": row.date.strftime("%Y-%m-%d"),
+            "price": int(row.min_price) if row.min_price else None
+        })
+    return jsonify(result)
+
+@api_bp.route('/checkins', methods=['GET'])
+@jwt_required()
+def get_checkins():
+    user_id = get_jwt_identity()
+    from app.models import CheckIn, Ticket, Flight
+
+    # Явно указываем, откуда join
+    checkins = (
+        db.session.query(CheckIn, Ticket, Flight)
+        .select_from(CheckIn)
+        .join(Ticket, CheckIn.ticket_id == Ticket.id)
+        .join(Flight, Ticket.flight_id == Flight.id)
+        .filter(CheckIn.user_id == user_id)
+        .order_by(CheckIn.checkin_time.desc())
+        .all()
+    )
+
+    result = []
+    for checkin, ticket, flight in checkins:
+        result.append({
+            "id": checkin.id,
+            "ticket_id": ticket.id,
+            "seat_number": ticket.seat_number,
+            "flight_number": flight.flight_number,
+            "checkin_time": checkin.checkin_time,
+        })
+    return jsonify(result)
+
+
+@api_bp.route('/checkins', methods=['POST'])
+@jwt_required()
+def create_checkin():
+    user_id = get_jwt_identity()
+    data = request.get_json()
+    ticket_id = data.get('ticket_id')
+    full_name = data.get('full_name')
+    passport = data.get('passport')
+
+    # Проверка на наличие обязательных полей
+    if not ticket_id or not full_name or not passport:
+        return jsonify({"error": "ticket_id, full_name, passport required"}), 400
+
+    ticket = Ticket.query.filter_by(id=ticket_id, user_id=user_id).first()
+    if not ticket:
+        return jsonify({"error": "Ticket not found"}), 404
+
+    existing = CheckIn.query.filter_by(ticket_id=ticket_id, user_id=user_id).first()
+    if existing:
+        return jsonify({"error": "Already checked in"}), 400
+
+    checkin = CheckIn(
+        user_id=user_id,
+        ticket_id=ticket_id,
+        full_name=full_name,
+        passport=passport
+    )
+    db.session.add(checkin)
+    db.session.commit()
+    return jsonify({"message": "Check-in successful"}), 201
+
+@api_bp.route('/checkins', methods=['OPTIONS'])
+@cross_origin()  # Это позволяет любому фронту делать preflight!
+def checkins_options():
+    return '', 200

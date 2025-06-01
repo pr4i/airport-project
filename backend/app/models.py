@@ -35,7 +35,6 @@ class User(db.Model):
             "roles": [role.name for role in self.roles]
         }
 
-
 class Airport(db.Model):
     __tablename__ = 'airports'
     id = db.Column(db.Integer, primary_key=True)
@@ -55,9 +54,13 @@ class Flight(db.Model):
     flight_number = db.Column(db.String(50), unique=True, nullable=False)
     departure_time = db.Column(db.DateTime, nullable=False)
     arrival_time = db.Column(db.DateTime, nullable=False)
-    origin_id = db.Column(db.Integer, db.ForeignKey('airports.id'))
-    destination_id = db.Column(db.Integer, db.ForeignKey('airports.id'))
+    origin_id = db.Column(db.Integer, db.ForeignKey('airports.id'), nullable=False)
+    destination_id = db.Column(db.Integer, db.ForeignKey('airports.id'), nullable=False)
     airplane_id = db.Column(db.Integer, db.ForeignKey('airplanes.id'))
+    status = db.Column(db.String(30), default='ожидает')
+    terminal = db.Column(db.String(10))
+    gate = db.Column(db.String(10))
+    price = db.Column(db.Integer, default=0)  # Новое поле для цены
 
     origin = db.relationship('Airport', foreign_keys=[origin_id])
     destination = db.relationship('Airport', foreign_keys=[destination_id])
@@ -69,9 +72,15 @@ class Flight(db.Model):
             "flight_number": self.flight_number,
             "departure_time": self.departure_time.isoformat() if self.departure_time else None,
             "arrival_time": self.arrival_time.isoformat() if self.arrival_time else None,
-            "origin": self.origin.name if self.origin else None,
-            "destination": self.destination.name if self.destination else None,
-            "airplane": self.airplane.model if self.airplane else None
+            "origin": self.origin.city if self.origin else None,
+            "origin_airport": self.origin.name if self.origin else None,
+            "destination": self.destination.city if self.destination else None,
+            "destination_airport": self.destination.name if self.destination else None,
+            "airplane": self.airplane.model if self.airplane else None,
+            "status": self.status if self.status else "неизвестно",
+            "terminal": self.terminal if self.terminal else "—",
+            "gate": self.gate if self.gate else "—",
+            "price": self.price
         }
 
 class Ticket(db.Model):
@@ -104,3 +113,15 @@ class Luggage(db.Model):
     description = db.Column(db.String(255))
 
     ticket = db.relationship('Ticket')
+
+class CheckIn(db.Model):
+    __tablename__ = 'checkins'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    ticket_id = db.Column(db.Integer, db.ForeignKey('tickets.id'), nullable=False)
+    checkin_time = db.Column(db.DateTime, server_default=db.func.now())
+    full_name = db.Column(db.String(128), nullable=False)
+    passport = db.Column(db.String(32), nullable=False)
+
+    user = db.relationship('User', backref=db.backref('checkins', lazy=True))
+    ticket = db.relationship('Ticket', backref=db.backref('checkins', lazy=True))

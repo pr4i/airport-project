@@ -71,6 +71,32 @@
             </v-card>
           </v-col>
         </v-row>
+
+        <!-- Блок с чек-инами -->
+        <v-row justify="center">
+          <v-col cols="12" md="8">
+            <v-card class="recent-card">
+              <v-card-title class="recent-title justify-center">Мои чекины</v-card-title>
+              <v-table class="recent-table">
+                <thead>
+                  <tr>
+                    <th>Рейс</th>
+                    <th>Место</th>
+                    <th>Дата чекина</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="checkin in checkins" :key="checkin.id">
+                    <td>{{ checkin.flight_number }}</td>
+                    <td>{{ checkin.seat_number }}</td>
+                    <td>{{ formatDate(checkin.checkin_time) }}</td>
+                  </tr>
+                </tbody>
+              </v-table>
+              <div v-if="!checkins.length" class="text-center py-4" style="color:#1976d2;">У вас пока нет чекинов.</div>
+            </v-card>
+          </v-col>
+        </v-row>
       </v-container>
     </v-main>
   </v-app>
@@ -81,7 +107,6 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '@/api'
 import { useUserStore } from '@/stores/user'
-import { storeToRefs } from 'pinia'
 
 const flightsCount = ref('-')
 const checkinsCount = ref('-')
@@ -92,6 +117,7 @@ const userStore = useUserStore()
 
 const userName = ref('')
 const recentTickets = ref([])
+const checkins = ref([]) // Список чек-инов
 
 function formatDate(dateStr) {
   if (!dateStr) return ''
@@ -114,7 +140,18 @@ onMounted(async () => {
     bookingsCount.value = ticketsRes.data.length
     recentTickets.value = ticketsRes.data.slice(-5).reverse()
 
-    checkinsCount.value = '-'
+    // Загружаем чекины для пользователя
+    const checkinsRes = await api.get('/api/checkins')
+    // Формируем удобный вид (flight_number, seat_number из связанного ticket)
+    checkins.value = (checkinsRes.data || []).map(item => ({
+      id: item.id,
+      flight_number: item.flight_number || (item.ticket && item.ticket.flight_number),
+      seat_number: item.seat_number || (item.ticket && item.ticket.seat_number),
+      checkin_time: item.checkin_time,
+    }))
+    checkinsCount.value = checkins.value.length
+
+    // Обслуживание (например, багажа)
     const luggagesRes = await api.get('/api/luggages')
     maintenanceCount.value = luggagesRes.data.length
   } catch (e) {

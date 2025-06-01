@@ -8,9 +8,9 @@
       </v-toolbar-title>
       <v-spacer />
       <v-btn v-if="userStore.isAdmin" text @click="router.push('/admin')">Админ-панель</v-btn>
-      <v-btn text>Бронирование</v-btn>
-      <v-btn text>Управление</v-btn>
-      <v-btn text>Онлайн-табло</v-btn>
+      <v-btn text @click="router.push('/onlineboard')">Онлайн-табло</v-btn>
+      <v-btn text @click="router.push('/flights')">Бронирование</v-btn>
+      <v-btn text @click="router.push('/checkin')">Регистрация</v-btn>
       <v-btn text @click="goToLK">Личный кабинет</v-btn>
       <v-btn
         v-if="!isAuth"
