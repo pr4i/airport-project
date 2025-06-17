@@ -1,17 +1,17 @@
 <template>
   <v-app>
     <!-- Верхняя навигационная панель -->
-    <v-app-bar app flat color="#07519a" dark class="main-app-bar">
+      <v-app-bar app color="#07519a" dark style="box-shadow: 0 2px 6px rgba(0,0,0,0.3); border-bottom: 1px solid white;">
       <v-toolbar-title class="airway-title">
         <v-icon left>mdi-airplane</v-icon>
         AIRWAY
       </v-toolbar-title>
       <v-spacer />
       <v-btn v-if="userStore.isAdmin" text @click="router.push('/admin')">Админ-панель</v-btn>
-      <v-btn text class="nav-link" @click="router.push('/')">Главная</v-btn>
-      <v-btn text class="nav-link" @click="router.push('/flights')">Рейсы</v-btn>
-      <v-btn text class="nav-link" @click="router.push('/dashboard')">Панель</v-btn>
-      <v-btn text class="nav-link">Обслуживание</v-btn>
+      <v-btn text class="nav-link" @click="router.push('/')">Главная cтраница</v-btn>
+      <v-btn text class="nav-link" @click="router.push('/onlineboard')">Онлайн-табло</v-btn>
+      <v-btn text class="nav-link" @click="router.push('/flights')">Бронирование</v-btn>
+      <v-btn text class="nav-link" @click="router.push('/register')">Регистрация</v-btn>
       <v-btn
         color="error"
         text
@@ -99,6 +99,8 @@
         </v-row>
       </v-container>
     </v-main>
+    <SiteFooter />
+
   </v-app>
 </template>
 
@@ -107,6 +109,8 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '@/api'
 import { useUserStore } from '@/stores/user'
+import SiteFooter from '@/components/SiteFooter.vue'
+
 
 const flightsCount = ref('-')
 const checkinsCount = ref('-')

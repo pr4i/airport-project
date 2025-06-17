@@ -1,14 +1,18 @@
 <template>
-  <v-card>
-    <v-card-title>Самолёты</v-card-title>
-    <v-btn color="primary" @click="openDialog">Добавить самолёт</v-btn>
-    <v-table>
-      <thead>
+  <v-card class="pa-4 admin-section-card" elevation="4">
+    <v-card-title class="text-h6 mb-4">Управление самолётами</v-card-title>
+
+    <v-btn color="primary" @click="openDialog" class="mb-4">
+      <v-icon left>mdi-plus</v-icon>Добавить самолёт
+    </v-btn>
+
+    <v-table class="elevation-1">
+      <thead class="admin-table-head">
         <tr>
           <th>ID</th>
           <th>Модель</th>
           <th>Кол-во мест</th>
-          <th>Действия</th>
+          <th class="text-center">Действия</th>
         </tr>
       </thead>
       <tbody>
@@ -16,23 +20,30 @@
           <td>{{ a.id }}</td>
           <td>{{ a.model }}</td>
           <td>{{ a.seats_count }}</td>
-          <td>
-            <v-btn size="small" @click="editAirplane(a)">✏️</v-btn>
-            <v-btn size="small" color="error" @click="deleteAirplane(a.id)">🗑</v-btn>
-          </td>
+        <td class="text-center">
+          <v-btn icon size="small" color="primary" @click="editAirplane(a)">
+            <v-icon>mdi-pencil</v-icon>
+          </v-btn>
+          <v-btn icon size="small" color="error" @click="deleteAirplane(a.id)">
+            <v-icon>mdi-delete</v-icon>
+          </v-btn>
+        </td>
+
         </tr>
       </tbody>
     </v-table>
-    <v-dialog v-model="dialog" max-width="400">
-      <v-card>
-        <v-card-title>{{ editingId ? 'Редактировать' : 'Добавить' }}</v-card-title>
+
+    <!-- Диалог добавления/редактирования -->
+    <v-dialog v-model="dialog" max-width="420">
+      <v-card class="pa-4">
+        <v-card-title class="text-h6 mb-2">{{ editingId ? 'Редактировать самолёт' : 'Добавить самолёт' }}</v-card-title>
         <v-card-text>
-          <v-text-field v-model="form.model" label="Модель" required />
-          <v-text-field v-model="form.seats_count" label="Кол-во мест" type="number" required />
+          <v-text-field v-model="form.model" label="Модель" required outlined dense />
+          <v-text-field v-model="form.seats_count" label="Кол-во мест" type="number" required outlined dense />
         </v-card-text>
         <v-card-actions>
-          <v-spacer/>
-          <v-btn @click="dialog = false">Отмена</v-btn>
+          <v-spacer />
+          <v-btn text @click="dialog = false">Отмена</v-btn>
           <v-btn color="primary" @click="saveAirplane">Сохранить</v-btn>
         </v-card-actions>
       </v-card>
@@ -80,3 +91,16 @@ async function deleteAirplane(id) {
 }
 onMounted(loadAirplanes)
 </script>
+
+<style scoped>
+.admin-section-card {
+  border-radius: 16px;
+  background: #fff;
+}
+.admin-table-head th {
+  background-color: #e3f0fd;
+  color: #07519a;
+  font-weight: 600;
+  font-size: 1rem;
+}
+</style>

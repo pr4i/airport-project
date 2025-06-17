@@ -436,3 +436,94 @@ def create_checkin():
 @cross_origin()  # Это позволяет любому фронту делать preflight!
 def checkins_options():
     return '', 200
+
+from app.models import Airplane
+
+@api_bp.route('/airplanes', methods=['GET'])
+@jwt_required()
+@roles_required('admin')
+def get_airplanes():
+    airplanes = Airplane.query.order_by(Airplane.id).all()
+    return jsonify([{
+        "id": a.id,
+        "model": a.model,
+        "seats_count": a.seats_count
+    } for a in airplanes])
+
+
+@api_bp.route('/airplanes', methods=['POST'])
+@jwt_required()
+@roles_required('admin')
+def create_airplane():
+    data = request.get_json()
+    airplane = Airplane(
+        model=data.get('model'),
+        seats_count=data.get('seats_count')
+    )
+    db.session.add(airplane)
+    db.session.commit()
+    return jsonify({"msg": "Airplane created", "id": airplane.id}), 201
+
+
+@api_bp.route('/airplanes/<int:id>', methods=['PUT'])
+@jwt_required()
+@roles_required('admin')
+def update_airplane(id):
+    airplane = Airplane.query.get_or_404(id)
+    data = request.get_json()
+    airplane.model = data.get('model', airplane.model)
+    airplane.seats_count = data.get('seats_count', airplane.seats_count)
+    db.session.commit()
+    return jsonify({"msg": "Airplane updated"})
+
+
+@api_bp.route('/airplanes/<int:id>', methods=['DELETE'])
+@jwt_required()
+@roles_required('admin')
+def delete_airplane(id):
+    airplane = Airplane.query.get_or_404(id)
+    db.session.delete(airplane)
+    db.session.commit()
+    return jsonify({"msg": "Airplane deleted"})
+
+from app.models import User, Role
+
+@api_bp.route('/users', methods=['GET'])
+@jwt_required()
+@roles_required('admin')
+def get_users():
+    users = User.query.all()
+    result = []
+    for u in users:
+        result.append({
+            "id": u.id,
+            "username": u.username,
+            "email": u.email,
+            "roles": [r.name for r in u.roles] if u.roles else []
+        })
+    return jsonify(result)
+
+
+@api_bp.route('/users/<int:id>', methods=['PUT'])
+@jwt_required()
+@roles_required('admin')
+def update_user(id):
+    user = User.query.get_or_404(id)
+    data = request.get_json()
+
+    if 'roles' in data:
+        roles = Role.query.filter(Role.name.in_(data['roles'])).all()
+        user.roles = roles
+
+    db.session.commit()
+    return jsonify({"msg": "User updated"})
+
+
+@api_bp.route('/users/<int:id>', methods=['DELETE'])
+@jwt_required()
+@roles_required('admin')
+def delete_user(id):
+    user = User.query.get_or_404(id)
+    db.session.delete(user)
+    db.session.commit()
+    return jsonify({"msg": "User deleted"})

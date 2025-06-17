@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <!-- Верхний бар -->
-    <v-app-bar app flat color="#07519a" dark>
+      <v-app-bar app color="#07519a" dark style="box-shadow: 0 2px 6px rgba(0,0,0,0.3); border-bottom: 1px solid white;">
       <v-toolbar-title>
         <v-icon left>mdi-airplane</v-icon>
         AIRWAY
@@ -183,69 +183,63 @@
       <v-col cols="12" md="4" class="footer-block">
         <h2 class="footer-title">Контакты</h2>
         <div class="footer-contacts">
-          <div class="footer-phone">
-          </div>
-          <div>8 (888) 444-55-55 бесплатно по России</div>
-          <div style="font-size: 0.9em; color: #bbdefb;">
+          <div class="footer-phone">8 (888) 444-55-55 бесплатно по России</div>
+          <div class="footer-subtext">
             для международных звонков в соответствии с тарифами вашего оператора связи
           </div>
-          <div class="footer-link"><a href="#" style="color:#fff;text-decoration:underline;">Обратная связь</a></div>
-          <v-btn color="orange" class="footer-call-btn" style="font-weight:600;">Позвонить с сайта</v-btn>
-          <div class="footer-socials mt-4">
-            <v-icon class="mr-2" color="white" size="28">mdi-telegram</v-icon>
-            <v-icon class="mr-2" color="white" size="28">mdi-vk</v-icon>
-            <v-icon class="mr-2" color="white" size="28">mdi-twitter</v-icon>
-            <v-icon class="mr-2" color="white" size="28">mdi-facebook</v-icon>
-            <v-icon color="white" size="28">mdi-youtube</v-icon>
+          <div class="footer-link"><a href="#">Обратная связь</a></div>
+          <v-btn color="orange" class="footer-call-btn">Позвонить с сайта</v-btn>
+          <div class="footer-socials mt-4 d-flex">
+            <v-icon class="footer-icon" aria-label="Telegram">mdi-telegram</v-icon>
+            <v-icon class="footer-icon" aria-label="VK">mdi-vk</v-icon>
+            <v-icon class="footer-icon" aria-label="Twitter">mdi-twitter</v-icon>
+            <v-icon class="footer-icon" aria-label="Facebook">mdi-facebook</v-icon>
+            <v-icon class="footer-icon" aria-label="YouTube">mdi-youtube</v-icon>
           </div>
         </div>
       </v-col>
+
       <!-- Компания -->
       <v-col cols="12" md="4" class="footer-block">
         <h2 class="footer-title">Компания</h2>
         <div class="footer-links">
-          <div><a href="#" class="footer-link">О компании</a></div>
-          <div><a href="#" class="footer-link">Контакты</a></div>
-          <div><a href="#" class="footer-link">Работа в AIRWAY</a></div>
-          <div><a href="#" class="footer-link">Политика конфиденциальности</a></div>
-          <div><a href="#" class="footer-link">Противодействие коррупции</a></div>
-          <div><a href="#" class="footer-link">Карта сайта</a></div>
+          <div><a href="#">О компании</a></div>
+          <div><a href="#">Контакты</a></div>
+          <div><a href="#">Работа в AIRWAY</a></div>
+          <div><a href="#">Политика конфиденциальности</a></div>
+          <div><a href="#">Противодействие коррупции</a></div>
+          <div><a href="#">Карта сайта</a></div>
         </div>
       </v-col>
+
       <!-- Партнерам -->
       <v-col cols="12" md="4" class="footer-block">
         <h2 class="footer-title">Партнерам</h2>
         <div class="footer-links">
-          <div><a href="#" class="footer-link">Агентам</a></div>
-          <div><a href="#" class="footer-link">Грузовые перевозки</a></div>
-          <div><a href="#" class="footer-link">Группа AIRWAY</a></div>
-          <div><a href="#" class="footer-link">Акционерам и инвесторам</a></div>
-          <div><a href="#" class="footer-link">Общее собрание акционеров 2025</a></div>
-          <div><a href="#" class="footer-link">Раскрытие информации для инвесторов</a></div>
+          <div><a href="#">Агентам</a></div>
+          <div><a href="#">Грузовые перевозки</a></div>
+          <div><a href="#">Группа AIRWAY</a></div>
+          <div><a href="#">Акционерам и инвесторам</a></div>
+          <div><a href="#">Общее собрание акционеров 2025</a></div>
+          <div><a href="#">Раскрытие информации для инвесторов</a></div>
         </div>
       </v-col>
     </v-row>
-    <v-divider style="margin-top:2px; margin-bottom:2px;" color="#1976d2" />
+
+    <v-divider class="my-2" color="#1976d2" />
+
     <v-row align="center" class="footer-bottom">
-      <v-col cols="12" md="6">
-        <span style="color:#fff;">© Авиакомпания «AIRWAY» 2008-2025</span>
+      <v-col cols="12" md="6" class="text-md-left text-center">
+        <span>© Авиакомпания «AIRWAY» 2008–2025</span>
       </v-col>
-      <v-col cols="12" md="6" class="d-flex align-center justify-end">
-        <v-img
-          src="https://cdn-icons-png.flaticon.com/512/4450/4450810.png"
-          alt="app"
-          height="48"
-          width="48"
-          class="mr-3"
-        />
-        <div style="color:#fff;">
-          Приложение «AIRWAY»<br>
-          для вашего мобильного устройства
-        </div>
+      <v-col cols="12" md="6" class="text-md-right text-center d-flex align-center justify-end justify-md-end justify-center">
+        <v-icon class="mr-2" color="white">mdi-cellphone</v-icon>
+        <div>Приложение «AIRWAY»<br />для вашего мобильного устройства</div>
       </v-col>
     </v-row>
   </v-container>
 </v-footer>
+
 
   </v-app>
 </template>
@@ -413,5 +407,62 @@ function logout() {
 .quick-links {
   margin-top: 16px;
 }
+.custom-footer {
+  background: linear-gradient(0deg, #0d47a1 0%, #1565c0 100%);
+  color: #fff;
+  padding-top: 24px;
+  padding-bottom: 16px;
+  font-size: 0.95rem;
+  border-top: 2px solid #0d47a1;
+}
+.footer-title {
+  font-size: 1.2rem;
+  color: #bbdefb;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.footer-block {
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+.footer-link a {
+  color: #fff;
+  text-decoration: none;
+}
+.footer-link a:hover,
+.footer-links a:hover {
+  color: #ffa726;
+  text-decoration: underline;
+}
+.footer-call-btn {
+  margin-top: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  min-height: 34px;
+  padding: 4px 16px;
+}
+.footer-subtext {
+  font-size: 0.85rem;
+  color: #bbdefb;
+  margin-bottom: 4px;
+}
+.footer-socials {
+  margin-top: 8px;
+  gap: 10px;
+}
+.footer-icon {
+  font-size: 22px;
+  cursor: pointer;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+.footer-icon:hover {
+  transform: scale(1.2);
+  color: #ffa726 !important;
+}
+.footer-bottom {
+  font-size: 0.85rem;
+  margin-top: 8px;
+}
+
 </style>
 

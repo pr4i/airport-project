@@ -1,16 +1,17 @@
 <template>
   <v-app>
     <!-- Навигационный бар -->
-    <v-app-bar app flat color="#07519a" dark>
+      <v-app-bar app color="#07519a" dark style="box-shadow: 0 2px 6px rgba(0,0,0,0.3); border-bottom: 1px solid white;">
       <v-toolbar-title>
         <v-icon left>mdi-airplane</v-icon>
         AIRWAY
       </v-toolbar-title>
       <v-spacer />
       <v-btn v-if="userStore?.isAdmin" text @click="router.push('/admin')">Админ-панель</v-btn>
+      <v-btn text @click="router.push('/')">Главная страница</v-btn>
       <v-btn text @click="router.push('/onlineboard')">Онлайн-табло</v-btn>
-      <v-btn text @click="router.push('/flights')">Бронирование</v-btn>
-      <v-btn text @click="goToLK">Личный кабинет</v-btn>
+      <v-btn text @click="router.push('/checkin')">Регистрация</v-btn>
+      <v-btn text @click="router.push('/dashboard')">Личный кабинет</v-btn>
       <v-btn v-if="!isAuth" icon @click="router.push('/login')" title="Войти">
         <v-icon>mdi-account-circle</v-icon>
       </v-btn>
@@ -118,6 +119,7 @@
         </div>
       </v-container>
     </v-main>
+    <SiteFooter />
   </v-app>
 </template>
 
@@ -126,6 +128,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import api from '@/api'
+import SiteFooter from '@/components/SiteFooter.vue'
 
 const router = useRouter()
 const userStore = useUserStore()
